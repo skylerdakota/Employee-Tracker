@@ -3,9 +3,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 const cTable = require('console.table');
-var passwordLock = require('dotenv').config;
-
-password = process.env.DB_password
+require('dotenv').config();
 
 // Sets up MySQL connection
 // =============================================================
@@ -19,7 +17,7 @@ var connection = mysql.createConnection({
   user: "root",
 
   // Password
-  password: "",
+  password: process.env.DB_password,
   database: "team_DB"
 });
 
@@ -30,9 +28,45 @@ connection.connect(function(err) {
   runPrompt();
 });
 
-// Main inquiry set for managing employees
+// Main inquiry set for choosing to manage employees, roles or departments
 // =============================================================
 function runPrompt() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to manage?",
+      choices: [
+        "Manage Employees",
+        "Manage Roles",
+        "Manage Departments",
+        "Exit"
+      ]
+    })
+    .then(function(answer) {
+      switch (answer.action) {
+      case "Manage Employees":
+        manageEmployees();
+        break;
+
+      case "Manage Roles":
+        manageRoles();
+        break;
+
+      case "Manage Departments":
+        manageDepartments();
+        break;
+
+      case "Exit":
+        connection.end();
+        break;
+      }
+    });
+}
+
+// Inquiry for choosing option to manage employees
+// =============================================================
+function manageEmployees() {
   inquirer
     .prompt({
       name: "action",
@@ -40,12 +74,11 @@ function runPrompt() {
       message: "What would you like to do?",
       choices: [
         "View all Employees",
-        "View all Employees by department",
-        //"View all Employees by manager",
         "Add Employee",
         //"Remove Emplpoyee",
         "Update Employee role",
-        //"Update Employee manager"
+        //"Update Employee manager",
+        "Exit"
       ]
     })
     .then(function(answer) {
@@ -54,9 +87,9 @@ function runPrompt() {
         employeeView();
         break;
 
-      case "View all Employees by department":
-        departmentView();
-        break;
+      // case "View all Employees by department":
+      //   departmentView();
+      //   break;
 
     //   case "View all Employees by manager":
     //     managerView();
@@ -66,7 +99,7 @@ function runPrompt() {
         employeeAdd();
         break;
 
-    //   case "Remove Emplpoyee":
+    //   case "Remove Employee":
     //     employeeSelect();
     //     //action or function to remove employee
     //     break;
@@ -80,6 +113,9 @@ function runPrompt() {
     //     employeeSelect();  
     //     updateManager();
     //     break;
+      case "Exit":
+        connection.end();
+        break;
       }
     });
 }
@@ -87,94 +123,31 @@ function runPrompt() {
 // Inquiry for viewing all employees
 // =============================================================
 function employeeView() {
-    .then(function(answer) {
-          var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
-            query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-            query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
-          connection.query(query, { artist: answer.artist }, function(err, res) {
-            for (var i = 0; i < res.length; i++)
-    console.table([
-        {
-          id: res[i].id,
-          first_name: res[i].first_name,
-          last_name: res[i].last_name,
-          title: res[i].title,
-          department: res[i].department,
-          salary: res[i].salary,
-          manager: res[i].manager_id
-        }, 
-      ]);
-    }
-
-// Inquiry for viewing all employees by department
-// =============================================================
-function departmentView() {
-    .then(function(answer) {
-          var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
-            query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-            query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
-          connection.query(query, { artist: answer.artist }, function(err, res) {
-            for (var i = 0; i < res.length; i++)
-    console.table([
-        {
-          id: res[i].id,
-          first_name: res[i].first_name,
-          last_name: res[i].last_name,
-          title: res[i].title,
-          department: res[i].department,
-          salary: res[i].salary,
-          manager: res[i].manager_id
-        }, 
-      ]);
-    }
-
-// Inquiry for viewing all employees by manager
-// =============================================================
-function managerView() {
-    .then(function(answer) {
-          var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
-            query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-            query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
-          connection.query(query, { artist: answer.artist }, function(err, res) {
-            for (var i = 0; i < res.length; i++)
-    console.table([
-        {
-          id: res[i].id,
-          first_name: res[i].first_name,
-          last_name: res[i].last_name,
-          title: res[i].title,
-          department: res[i].department,
-          salary: res[i].salary,
-          manager: res[i].manager_id
-        }, 
-      ]);
-        }   
-    runPrompt();
-    }
-}
-
-// Inquiry for removing an employee
-// =============================================================
-function employeeSelect() {
-  inquirer
-    .prompt({
-      name: "action",
-      type: "rawlist",
-      message: "Which employee would you like to remove?",
-      choices: [
-        "option placeholder",
-      ]
-    })
-    .then(function(answer) {
-    //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
-    //   connection.query(query, { artist: answer.artist }, function(err, res) {
-    //     for (var i = 0; i < res.length; i++) {
-    //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-    //     }
-        runPrompt();
-      });
+    let query = "SELECT * FROM employee";
+    connection.query(query, function(err, res){
+      if (err) throw err;
+      console.table(res);
+      runPrompt();
     });
 }
+//     .then(function(answer) {
+//           var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
+//             query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
+//             query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
+//           connection.query(query, { artist: answer.artist }, function(err, res) {
+//             for (var i = 0; i < res.length; i++)
+//     console.table([
+//         {
+//           id: res[i].id,
+//           first_name: res[i].first_name,
+//           last_name: res[i].last_name,
+//           title: res[i].title,
+//           department: res[i].department,
+//           salary: res[i].salary,
+//           manager: res[i].manager_id
+//         }, 
+//       ]);
+//     }
 
 // Inquiry for adding an employee
 // =============================================================
@@ -195,75 +168,219 @@ function employeeAdd() {
         name: "role",
         type: "input",
         message: "What is the employee's last role?",
-      }
+      },
       {
         name: "role",
         type: "input",
         message: "Who is the employee's manager?",
       }
     ])
+//     .then(function(answer) {
+//     //   var query = "SELECT position,song,artist,year FROM top5000 WHERE position BETWEEN ? AND ?";
+//     //   connection.query(query, [answer.start, answer.end], function(err, res) {
+//     //     for (var i = 0; i < res.length; i++) {
+//     //       console.log(
+//     //         "Position: " +
+//     //           res[i].position +
+//     //           " || Song: " +
+//     //           res[i].song +
+//     //           " || Artist: " +
+//     //           res[i].artist +
+//     //           " || Year: " +
+//     //           res[i].year
+//     //       );
+//     //     }
+//         runPrompt();
+//       });
+//     });
+}
+
+// Inquiry for choosing option to manage roles
+// =============================================================
+function manageRoles() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: [
+        "View all roles",
+        "Add role",
+        //"Remove role",
+        "Exit"
+      ]
+    })
     .then(function(answer) {
-    //   var query = "SELECT position,song,artist,year FROM top5000 WHERE position BETWEEN ? AND ?";
-    //   connection.query(query, [answer.start, answer.end], function(err, res) {
-    //     for (var i = 0; i < res.length; i++) {
-    //       console.log(
-    //         "Position: " +
-    //           res[i].position +
-    //           " || Song: " +
-    //           res[i].song +
-    //           " || Artist: " +
-    //           res[i].artist +
-    //           " || Year: " +
-    //           res[i].year
-    //       );
-    //     }
-        runPrompt();
-      });
+      switch (answer.action) {
+      case "View all Roles":
+        roleView();
+        break;
+
+      case "Add Role":
+        roleAdd();
+        break;
+
+    //   case "Remove role":
+    //     roleRemove();
+    //     break;
+
+      case "Exit":
+        connection.end();
+        break;
+      }
     });
 }
 
-// Inquiry for updating a role
-// =============================================================
-function updateRole() {
-    inquirer
-      .prompt({
-        name: "action",
-        type: "rawlist",
-        message: "What is the employee's new role?",
-        choices: [
-          "option placeholder",
-        ]
-      })
-      .then(function(answer) {
-      //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
-      //   connection.query(query, { artist: answer.artist }, function(err, res) {
-      //     for (var i = 0; i < res.length; i++) {
-      //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-      //     }
-          runPrompt();
-        });
-      });
-  }
 
-// Inquiry for updating manager
+// Inquiry for choosing option to manage departments
 // =============================================================
-function updateManager() {
-    inquirer
-      .prompt({
-        name: "action",
-        type: "rawlist",
-        message: "Who is the employee's new manager?",
-        choices: [
-          "option placeholder",
-        ]
-      })
-      .then(function(answer) {
-      //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
-      //   connection.query(query, { artist: answer.artist }, function(err, res) {
-      //     for (var i = 0; i < res.length; i++) {
-      //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-      //     }
-          runPrompt();
-        });
-      });
-  }
+function manageDepartments() {
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: [
+        "View all departments",
+        "Add department",
+        //"Remove department",
+        "Exit"
+      ]
+    })
+    .then(function(answer) {
+      switch (answer.action) {
+      case "View all departments":
+        departmentView();
+        break;
+
+      case "Add department":
+        departmentAdd();
+        break;
+
+    //   case "Remove department":
+    //     departmentRemovet();
+    //     break;
+
+      case "Exit":
+        connection.end();
+        break;
+      }
+    });
+}
+// // Inquiry for viewing all employees by department
+// // =============================================================
+// function departmentView() {
+//     .then(function(answer) {
+//           var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
+//             query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
+//             query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
+//           connection.query(query, { artist: answer.artist }, function(err, res) {
+//             for (var i = 0; i < res.length; i++)
+//     console.table([
+//         {
+//           id: res[i].id,
+//           first_name: res[i].first_name,
+//           last_name: res[i].last_name,
+//           title: res[i].title,
+//           department: res[i].department,
+//           salary: res[i].salary,
+//           manager: res[i].manager_id
+//         }, 
+//       ]);
+//     }
+
+// // Inquiry for viewing all employees by manager
+// // =============================================================
+// function managerView() {
+//     .then(function(answer) {
+//           var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
+//             query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
+//             query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
+//           connection.query(query, { artist: answer.artist }, function(err, res) {
+//             for (var i = 0; i < res.length; i++)
+//     console.table([
+//         {
+//           id: res[i].id,
+//           first_name: res[i].first_name,
+//           last_name: res[i].last_name,
+//           title: res[i].title,
+//           department: res[i].department,
+//           salary: res[i].salary,
+//           manager: res[i].manager_id
+//         }, 
+//       ]);
+//         }   
+//     runPrompt();
+//     }
+// }
+
+// // Inquiry for removing an employee
+// // =============================================================
+// function employeeSelect() {
+//   inquirer
+//     .prompt({
+//       name: "action",
+//       type: "rawlist",
+//       message: "Which employee would you like to remove?",
+//       choices: [
+//         "option placeholder",
+//       ]
+//     })
+//     .then(function(answer) {
+//     //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
+//     //   connection.query(query, { artist: answer.artist }, function(err, res) {
+//     //     for (var i = 0; i < res.length; i++) {
+//     //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
+//     //     }
+//         runPrompt();
+//       });
+//     });
+// }
+
+
+
+// // Inquiry for updating a role
+// // =============================================================
+// function updateRole() {
+//     inquirer
+//       .prompt({
+//         name: "action",
+//         type: "rawlist",
+//         message: "What is the employee's new role?",
+//         choices: [
+//           "option placeholder",
+//         ]
+//       })
+//       .then(function(answer) {
+//       //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
+//       //   connection.query(query, { artist: answer.artist }, function(err, res) {
+//       //     for (var i = 0; i < res.length; i++) {
+//       //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
+//       //     }
+//           runPrompt();
+//         });
+//       });
+//   }
+
+// // Inquiry for updating manager
+// // =============================================================
+// function updateManager() {
+//     inquirer
+//       .prompt({
+//         name: "action",
+//         type: "rawlist",
+//         message: "Who is the employee's new manager?",
+//         choices: [
+//           "option placeholder",
+//         ]
+//       })
+//       .then(function(answer) {
+//       //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
+//       //   connection.query(query, { artist: answer.artist }, function(err, res) {
+//       //     for (var i = 0; i < res.length; i++) {
+//       //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
+//       //     }
+//           runPrompt();
+//         });
+//       });
+//   }
