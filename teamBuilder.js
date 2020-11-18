@@ -87,30 +87,31 @@ function manageEmployees() {
         employeeView();
         break;
 
-      // case "View all Employees by department":
-      //   departmentView();
-      //   break;
-
-    //   case "View all Employees by manager":
-    //     managerView();
-    //     break;
-
       case "Add Employee":
         employeeAdd();
         break;
-
-    //   case "Remove Employee":
-    //     employeeSelect();
-    //     //action or function to remove employee
-    //     break;
 
       case "Update Employee role":
         updateRole();
         break;
 
+     //   case "Remove Employee":
+    //     employeeSelect();
+    //     //action or function to remove employee
+    //     break;
+
+    // case "View all Employees by department":
+    //   departmentView();
+    //   break;
+
+    //   case "View all Employees by manager":
+    //     managerView();
+    //     break;
+
     //   case "Update Employee manager": 
     //     updateManager();
     //     break;
+
       case "Exit":
         connection.end();
         break;
@@ -176,7 +177,7 @@ function employeeAdd() {
 // =============================================================
 function updateRole() {
     inquirer
-      .prompt(
+      .prompt([
         {
           name: "employeeChoice",
           type: "input",
@@ -184,14 +185,24 @@ function updateRole() {
         },
         {
         name: "roleChoice",
-        type: "inout",
+        type: "input",
         message: "What is the employee's new role?",
-      })
+      },
+      ])
       .then(function(answer) {
-        let query = "UPDATE employee SET role_id = ? WHERE first_name = ?"
-        connection.query (query, [answer.employeeChoice, answer.roleChoice], function (err, res){
+        connection.query (
+          "UPDATE employee SET ? WHERE ?", 
+          [
+            {
+              role_id: answer.roleChoice
+            },
+            {
+              first_name: answer.employeeChoice,
+            }
+          ], 
+          function (err){
           if (err) throw err;
-          console.table(res);
+          console.log("succeefully updated employee's role");
           runPrompt();
         });
         });
