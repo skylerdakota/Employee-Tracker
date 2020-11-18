@@ -7,8 +7,6 @@ An app that manages a company's employees using node, inquirer, and MySQL.
 
 * [Application Demonstration](https://drive.google.com/file/d/1_l8_6NPDfOKkbnZ2uPWfq_kQCsrTSwHI/preview)
 
-![Demo](public/assets/employee-tracker.gif)
-
 #### Table of Contents
 
 1. [Project Description](#project-description)
