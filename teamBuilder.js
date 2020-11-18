@@ -75,7 +75,7 @@ function manageEmployees() {
       choices: [
         "View all Employees",
         "Add Employee",
-        //"Remove Emplpoyee",
+        //"Remove Employee",
         "Update Employee role",
         //"Update Employee manager",
         "Exit"
@@ -167,14 +167,30 @@ function employeeAdd() {
       {
         name: "role",
         type: "input",
-        message: "What is the employee's last role?",
+        message: "What is the employee's role #?",
       },
-      {
-        name: "role",
-        type: "input",
-        message: "Who is the employee's manager?",
-      }
+      // {
+      //   name: "role",
+      //   type: "input",
+      //   message: "Who is the employee's manager?",
+      // }
     ])
+      .then(function(answer) {
+        connection.query(
+          "INSERT INTO employee SET ?",
+          {
+            first_name: answer.first_name,
+            last_name: answer.last_name,
+            role_id: answer.employee_role,
+          },
+          function (err) {
+            if (err) throw err;
+            console.log("succeefully added new employee");
+            runPrompt();
+          }
+        );
+      });
+}
 //     .then(function(answer) {
 //     //   var query = "SELECT position,song,artist,year FROM top5000 WHERE position BETWEEN ? AND ?";
 //     //   connection.query(query, [answer.start, answer.end], function(err, res) {
@@ -193,7 +209,7 @@ function employeeAdd() {
 //         runPrompt();
 //       });
 //     });
-}
+// }
 
 // Inquiry for choosing option to manage roles
 // =============================================================
@@ -231,6 +247,43 @@ function manageRoles() {
     });
 }
 
+// Inquiry for adding a role
+// =============================================================
+function roleAdd() {
+  inquirer
+    .prompt([
+      {
+        name: "first",
+        type: "input",
+        message: "What is the name of the new role?",
+      },
+      {
+        name: "last",
+        type: "input",
+        message: "What is the salary?",
+      },
+      {
+        name: "role",
+        type: "input",
+        message: "What is the role's department #?",
+      },
+    ])
+      .then(function(answer) {
+        connection.query(
+          "INSERT INTO role SET ?",
+          {
+            title: answer.title,
+            salary: answer.salary,
+            department_id: answer.department_id,
+          },
+          function (err) {
+            if (err) throw err;
+            console.log("succeefully added new role");
+            runPrompt();
+          }
+        );
+      });
+}
 
 // Inquiry for choosing option to manage departments
 // =============================================================
@@ -266,6 +319,32 @@ function manageDepartments() {
         break;
       }
     });
+}
+
+// Inquiry for adding a department
+// =============================================================
+function roleAdd() {
+  inquirer
+    .prompt([
+      {
+        name: "first",
+        type: "input",
+        message: "What is the name of the new department?",
+      },
+    ])
+      .then(function(answer) {
+        connection.query(
+          "INSERT INTO role SET ?",
+          {
+            department_name: answer.department_name,
+          },
+          function (err) {
+            if (err) throw err;
+            console.log("succeefully added new department");
+            runPrompt();
+          }
+        );
+      });
 }
 // // Inquiry for viewing all employees by department
 // // =============================================================
