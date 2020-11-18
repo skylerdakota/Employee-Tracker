@@ -5,11 +5,11 @@ USE team_DB;
 
 CREATE TABLE department (
   id INT NOT NULL AUTO_INCREMENT, 
-  name VARCHAR(30) NOT NULL,
+  name_ VARCHAR(30) NOT NULL,
   PRIMARY KEY (id)
 );
 
-CREATE TABLE role (
+CREATE TABLE roles (
   id INT NOT NULL AUTO_INCREMENT,
   title VARCHAR(30) NOT NULL,
   salary DECIMAL(10,4) NOT NULL,
@@ -27,5 +27,5 @@ CREATE TABLE employee (
 );
 
 SELECT * FROM department;
-SELECT * FROM role;
+SELECT * FROM roles;
 SELECT * FROM employee;
