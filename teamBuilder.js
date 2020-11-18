@@ -105,12 +105,10 @@ function manageEmployees() {
     //     break;
 
       case "Update Employee role":
-        employeeSelect();
         updateRole();
         break;
 
-    //   case "Update Employee manager":
-    //     employeeSelect();  
+    //   case "Update Employee manager": 
     //     updateManager();
     //     break;
       case "Exit":
@@ -130,24 +128,6 @@ function employeeView() {
       runPrompt();
     });
 }
-//     .then(function(answer) {
-//           var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
-//             query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-//             query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
-//           connection.query(query, { artist: answer.artist }, function(err, res) {
-//             for (var i = 0; i < res.length; i++)
-//     console.table([
-//         {
-//           id: res[i].id,
-//           first_name: res[i].first_name,
-//           last_name: res[i].last_name,
-//           title: res[i].title,
-//           department: res[i].department,
-//           salary: res[i].salary,
-//           manager: res[i].manager_id
-//         }, 
-//       ]);
-//     }
 
 // Inquiry for adding an employee
 // =============================================================
@@ -179,9 +159,9 @@ function employeeAdd() {
         connection.query(
           "INSERT INTO employee SET ?",
           {
-            first_name: answer.first_name,
-            last_name: answer.last_name,
-            role_id: answer.employee_role,
+            first_name: answer.first,
+            last_name: answer.last,
+            role_id: answer.role,
           },
           function (err) {
             if (err) throw err;
@@ -191,25 +171,66 @@ function employeeAdd() {
         );
       });
 }
-//     .then(function(answer) {
-//     //   var query = "SELECT position,song,artist,year FROM top5000 WHERE position BETWEEN ? AND ?";
-//     //   connection.query(query, [answer.start, answer.end], function(err, res) {
-//     //     for (var i = 0; i < res.length; i++) {
-//     //       console.log(
-//     //         "Position: " +
-//     //           res[i].position +
-//     //           " || Song: " +
-//     //           res[i].song +
-//     //           " || Artist: " +
-//     //           res[i].artist +
-//     //           " || Year: " +
-//     //           res[i].year
-//     //       );
-//     //     }
-//         runPrompt();
-//       });
-//     });
-// }
+
+// Inquiry for updating an employee's role
+// =============================================================
+function updateRole() {
+    inquirer
+      .prompt(
+        {
+          name: "employeeChoice",
+          type: "input",
+          message: "Which employee would you like to update?"
+        },
+        {
+        name: "roleChoice",
+        type: "inout",
+        message: "What is the employee's new role?",
+      })
+      .then(function(answer) {
+        let query = "UPDATE employee SET role_id = ? WHERE first_name = ?"
+        connection.query (query, [answer.employeeChoice, answer.roleChoice], function (err, res){
+          if (err) throw err;
+          console.table(res);
+          runPrompt();
+        });
+        });
+      }
+
+// // Inquiry for viewing all employees by department
+// // =============================================================
+// function departmentView() 
+
+// // Inquiry for viewing all employees by manager
+// // =============================================================
+// function managerView() 
+
+// // Inquiry for removing an employee
+// // =============================================================
+// function employeeSelect() {
+//   inquirer
+//     .prompt({
+//       name: "action",
+//       type: "rawlist",
+//       message: "Which employee would you like to remove?",
+//       choices: [
+//         "option placeholder",
+//       ]
+//     })
+
+// // Inquiry for updating an employee's manager
+// // =============================================================
+// function updateManager() {
+//     inquirer
+//       .prompt({
+//         name: "action",
+//         type: "rawlist",
+//         message: "Who is the employee's new manager?",
+//         choices: [
+//           "option placeholder",
+//         ]
+//       })
+// 
 
 // Inquiry for choosing option to manage roles
 // =============================================================
@@ -228,11 +249,11 @@ function manageRoles() {
     })
     .then(function(answer) {
       switch (answer.action) {
-      case "View all Roles":
+      case "View all roles":
         roleView();
         break;
 
-      case "Add Role":
+      case "Add role":
         roleAdd();
         break;
 
@@ -247,34 +268,45 @@ function manageRoles() {
     });
 }
 
+// Inquiry for viewing all roles
+// =============================================================
+function roleView() {
+  let query = "SELECT * FROM roles";
+  connection.query(query, function(err, res){
+    if (err) throw err;
+    console.table(res);
+    runPrompt();
+  });
+}
+
 // Inquiry for adding a role
 // =============================================================
 function roleAdd() {
   inquirer
     .prompt([
       {
-        name: "first",
+        name: "title",
         type: "input",
         message: "What is the name of the new role?",
       },
       {
-        name: "last",
+        name: "salary",
         type: "input",
         message: "What is the salary?",
       },
-      {
-        name: "role",
-        type: "input",
-        message: "What is the role's department #?",
-      },
+      // {
+      //   name: "department_id",
+      //   type: "input",
+      //   message: "What is the role's department #?",
+      // },
     ])
       .then(function(answer) {
         connection.query(
-          "INSERT INTO role SET ?",
+          "INSERT INTO roles SET ?",
           {
             title: answer.title,
             salary: answer.salary,
-            department_id: answer.department_id,
+            // department_id: answer.department_id,
           },
           function (err) {
             if (err) throw err;
@@ -321,22 +353,33 @@ function manageDepartments() {
     });
 }
 
+// Inquiry for viewing all departments
+// =============================================================
+function departmentView() {
+  let query = "SELECT * FROM department";
+  connection.query(query, function(err, res){
+    if (err) throw err;
+    console.table(res);
+    runPrompt();
+  });
+}
+
 // Inquiry for adding a department
 // =============================================================
-function roleAdd() {
+function departmentAdd() {
   inquirer
     .prompt([
       {
-        name: "first",
+        name: "department_name",
         type: "input",
         message: "What is the name of the new department?",
       },
     ])
       .then(function(answer) {
         connection.query(
-          "INSERT INTO role SET ?",
+          "INSERT INTO department SET ?",
           {
-            department_name: answer.department_name,
+            name_: answer.department_name,
           },
           function (err) {
             if (err) throw err;
@@ -346,120 +389,3 @@ function roleAdd() {
         );
       });
 }
-// // Inquiry for viewing all employees by department
-// // =============================================================
-// function departmentView() {
-//     .then(function(answer) {
-//           var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
-//             query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-//             query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
-//           connection.query(query, { artist: answer.artist }, function(err, res) {
-//             for (var i = 0; i < res.length; i++)
-//     console.table([
-//         {
-//           id: res[i].id,
-//           first_name: res[i].first_name,
-//           last_name: res[i].last_name,
-//           title: res[i].title,
-//           department: res[i].department,
-//           salary: res[i].salary,
-//           manager: res[i].manager_id
-//         }, 
-//       ]);
-//     }
-
-// // Inquiry for viewing all employees by manager
-// // =============================================================
-// function managerView() {
-//     .then(function(answer) {
-//           var query = "SELECT employee.id, employee.first_name, employee.last_name, employee.manager_id, role.title, role.department, role.salary";
-//             query += "FROM top_albums INNER JOIN top5000 ON (top_albums.artist = top5000.artist AND top_albums.year ";
-//             query += "= top5000.year) WHERE (top_albums.artist = ? AND top5000.artist = ?) ORDER BY top_albums.year, top_albums.position";
-//           connection.query(query, { artist: answer.artist }, function(err, res) {
-//             for (var i = 0; i < res.length; i++)
-//     console.table([
-//         {
-//           id: res[i].id,
-//           first_name: res[i].first_name,
-//           last_name: res[i].last_name,
-//           title: res[i].title,
-//           department: res[i].department,
-//           salary: res[i].salary,
-//           manager: res[i].manager_id
-//         }, 
-//       ]);
-//         }   
-//     runPrompt();
-//     }
-// }
-
-// // Inquiry for removing an employee
-// // =============================================================
-// function employeeSelect() {
-//   inquirer
-//     .prompt({
-//       name: "action",
-//       type: "rawlist",
-//       message: "Which employee would you like to remove?",
-//       choices: [
-//         "option placeholder",
-//       ]
-//     })
-//     .then(function(answer) {
-//     //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
-//     //   connection.query(query, { artist: answer.artist }, function(err, res) {
-//     //     for (var i = 0; i < res.length; i++) {
-//     //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-//     //     }
-//         runPrompt();
-//       });
-//     });
-// }
-
-
-
-// // Inquiry for updating a role
-// // =============================================================
-// function updateRole() {
-//     inquirer
-//       .prompt({
-//         name: "action",
-//         type: "rawlist",
-//         message: "What is the employee's new role?",
-//         choices: [
-//           "option placeholder",
-//         ]
-//       })
-//       .then(function(answer) {
-//       //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
-//       //   connection.query(query, { artist: answer.artist }, function(err, res) {
-//       //     for (var i = 0; i < res.length; i++) {
-//       //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-//       //     }
-//           runPrompt();
-//         });
-//       });
-//   }
-
-// // Inquiry for updating manager
-// // =============================================================
-// function updateManager() {
-//     inquirer
-//       .prompt({
-//         name: "action",
-//         type: "rawlist",
-//         message: "Who is the employee's new manager?",
-//         choices: [
-//           "option placeholder",
-//         ]
-//       })
-//       .then(function(answer) {
-//       //   var query = "SELECT position, song, year FROM top5000 WHERE ?";
-//       //   connection.query(query, { artist: answer.artist }, function(err, res) {
-//       //     for (var i = 0; i < res.length; i++) {
-//       //       console.log("Position: " + res[i].position + " || Song: " + res[i].song + " || Year: " + res[i].year);
-//       //     }
-//           runPrompt();
-//         });
-//       });
-//   }
